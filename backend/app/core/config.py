@@ -22,8 +22,9 @@ class Settings:
     GOOGLE_CLOUD_REGION: str = os.getenv("GOOGLE_CLOUD_REGION", "asia-south1")
     GOOGLE_MAPS_API_KEY: str = os.getenv("GOOGLE_MAPS_API_KEY", "")
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./cyclopath.db")
-    JWT_SECRET: str = os.getenv("JWT_SECRET", "cyclopath-super-secure-jwt-key-2026")
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "")
     DEMO_MODE: bool = os.getenv("DEMO_MODE", "true").lower() in ("true", "1", "yes")
+    CORS_ORIGINS: list[str] = [origin.strip() for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",") if origin.strip()]
 
     # Dynamic configurable weights
     DEFAULT_WEIGHTS: RiskWeights = RiskWeights()
