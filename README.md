@@ -1,4 +1,4 @@
-# CYCLOPATH AI 🌀
+# CYCLOPATH AI 
 ### *Predict the impact. Protect the infrastructure. Save communities.*
 
 > **Google "Build with AI: Code for Communities" Hackathon**  
@@ -11,15 +11,8 @@
 [![Multimodal AI: Gemini 1.5](https://img.shields.io/badge/Multimodal%20AI-Google%20Gemini%201.5-purple)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey)](#)
 
----
 
-## 📌 Executive Summary & 30-Second Pitch
-
-> **"Cyclopath AI is an AI-powered disaster intelligence and infrastructure vulnerability platform for cyclone-prone Indian communities. It combines cyclone atmospheric forecasts, satellite and geospatial data, critical asset telemetry, machine learning, and Google Gemini-powered reasoning to identify vulnerable infrastructure before a cyclone makes landfall. Instead of only telling authorities where the cyclone is heading, Cyclopath AI predicts which hospitals, power substations, bridges, and shelters will fail, explains *why* using Explainable AI (SHAP factors), calculates flood-safe evacuation routes via Dijkstra graph algorithms, and synthesizes prioritized, role-specific emergency action plans in English, Hindi, and Marathi."**
-
----
-
-## 🎯 The Problem: Solving for India's 7,516 km Coastline
+The Problem: Solving for India's 7,516 km Coastline
 
 Every year, severe cyclonic storms in the Bay of Bengal and Arabian Sea threaten coastal states including **Odisha, West Bengal, Andhra Pradesh, Tamil Nadu, Maharashtra, and Gujarat**.
 
@@ -33,7 +26,7 @@ While the India Meteorological Department (IMD) provides high-accuracy atmospher
 
 ---
 
-## 🏗️ System Architecture
+System Architecture
 
 ```mermaid
 flowchart TD
@@ -72,7 +65,7 @@ flowchart TD
 
 ---
 
-## ☁️ Google Cloud Platform Architecture
+Google Cloud Platform Architecture
 
 Cyclopath AI is built ground-up for enterprise cloud resilience:
 
@@ -86,7 +79,7 @@ Cyclopath AI is built ground-up for enterprise cloud resilience:
 
 ---
 
-## ⚡ Key Features
+Key Features
 
 | Feature | Description |
 | :--- | :--- |
@@ -104,7 +97,7 @@ Cyclopath AI is built ground-up for enterprise cloud resilience:
 
 ---
 
-## 📂 Project Repository Structure
+Project Repository Structure
 
 ```
 CycloPath/
@@ -173,7 +166,7 @@ CycloPath/
 
 ---
 
-## 🚀 Quickstart Guide
+Quickstart Guide
 
 ### 1. Prerequisites
 - **Python 3.10+** (tested on 3.11 & 3.14)
@@ -202,7 +195,7 @@ python server.py
 ```
 *Backend is now live at `http://127.0.0.1:8000`. You can verify by visiting `http://127.0.0.1:8000/api/health`.*
 
-#### Step 2: Start the Frontend
+Step 2: Start the Frontend
 ```bash
 # Open a new terminal and navigate to frontend directory
 cd frontend
@@ -217,7 +210,7 @@ npm run dev
 
 ---
 
-### 3. Running with Docker Compose
+3. Running with Docker Compose
 
 To launch the full production-grade stack with a single command:
 ```bash
@@ -229,7 +222,7 @@ docker-compose up --build
 
 ---
 
-## 🧪 Automated Integration Tests
+Automated Integration Tests
 
 Cyclopath AI includes an end-to-end integration test verifying all 11 API endpoints:
 ```bash
@@ -250,46 +243,18 @@ Output:
 [PASS] Health Observability: Status 200 (All subsystems ONLINE)
 [PASS] Data Sources: Status 200 (IMD, ISRO, OSM, Census tracked)
 ```
-
----
-
-## 🎬 3-Minute Hackathon Demo Script
-
-Follow this chronological walkthrough during your hackathon presentation:
-
-1. **Minute 0:00 – The Hook & Overview**:
-   - Open `http://127.0.0.1:5173/`. Show the dark command center.
-   - Explain the core thesis: *"When Cyclone SAMUDRA approaches the Odisha coast, district officials don't need another generic weather widget. They need to know which hospital loses power, which bridge floods, and what action to take first."*
-2. **Minute 0:45 – Geospatial Intelligence & Explainable AI**:
-   - Switch to **Risk Map**. Point out the Cyclone cone, wind intensity rings, and color-coded infrastructure markers.
-   - Click on **Puri District Headquarters Hospital**.
-   - Show the **Asset Detail Modal**: Point out the **SHAP factor breakdown** (`+26 Cyclone Proximity`, `+21 Storm Surge`, `+18 Critical Power Dependency`) demonstrating that this is explainable AI, not an ungrounded black box.
-3. **Minute 1:30 – What-If Scenario Simulation**:
-   - Navigate to **Scenario Simulator**.
-   - Increase storm surge from 2.5m to 4.2m and wind speed to 195 km/h. Click **"Run What-If Simulation"**.
-   - Show the instant **Before vs. After Delta**: *Critical assets increase from 14 to 31 (+121%)*.
-4. **Minute 2:10 – Cyclopath Response Agent & Safe Routing**:
-   - Click **AI Response Agent**. Click quick query *"Which hospitals need backup power?"*.
-   - Show the **transparent tool-calling execution trace** (`get_infrastructure_risk`, `get_cyclone_status`).
-   - Switch to **Emergency Routing** to calculate the flood-safe route between Puri Hospital and Konark Shelter.
-5. **Minute 2:45 – Multilingual & Multimodal Vision**:
-   - Click the language selector in the navbar: switch to **हिंदी (Hindi)** or **मराठी (Marathi)** to prove grassroots India readiness.
-   - Switch to **Image Inspector** to demonstrate Gemini 1.5 analyzing structural crack imagery of a coastal seawall.
-
----
-
-## 🛡️ Responsible AI & Disaster Decision-Support Disclaimer
+Responsible AI & Disaster Decision-Support Disclaimer
 
 > **IMPORTANT NOTICE**:  
 > Cyclopath AI is designed strictly as a **decision-support prototype** for disaster management personnel, emergency planners, and municipal engineers.  
 > 
-> - **AI-generated risk scores, damage probabilities, and action recommendations are advisory estimates** and must always be cross-referenced with official advisories issued by the **India Meteorological Department (IMD)**, the **National Disaster Management Authority (NDMA)**, and local State Disaster Management Authorities (SDMAs).
+> - AI-generated risk scores, damage probabilities, and action recommendations are advisory estimates** and must always be cross-referenced with official advisories issued by the **India Meteorological Department (IMD)**, the **National Disaster Management Authority (NDMA)**, and local State Disaster Management Authorities (SDMAs).
 > - Cyclopath AI does not replace certified structural engineering inspections, certified geotechnical surveys, or official government evacuation orders.
 > - All demonstration datasets are clearly designated as **Demo Simulation** data for developmental and hackathon evaluation purposes.
 
----
 
-## 👥 Authors & Team
+
+Authors & Team
 - **Built for**: Google "Build with AI: Code for Communities" Hackathon
 - **Team**: Cyclopath AI Engineering Team
 - **Repository**: [https://github.com/rehan0018/CycloPath](https://github.com/rehan0018/CycloPath)
