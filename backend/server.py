@@ -1,4 +1,5 @@
 import sys
+import asyncio
 import os
 import json
 import urllib.parse
@@ -289,7 +290,7 @@ class CyclopathAPIHandler(BaseHTTPRequestHandler):
         # Multimodal Image Inspection
         if path == "/api/multimodal/analyze":
             req = MultimodalAnalysisRequest(**payload)
-            result = gemini_service._fallback_image_analysis(req.asset_id, req.context_notes)
+            result = asyncio.run(gemini_service.analyze_infrastructure_image(\n                image_base64=req.image_base64,\n                asset_id=req.asset_id,\n                context_notes=req.context_notes\n            ))
             self.send_json(result.model_dump())
             return
 
@@ -317,7 +318,7 @@ class CyclopathAPIHandler(BaseHTTPRequestHandler):
         self.send_json({"error": "Endpoint not found", "path": path}, status=404)
 
 def run_server(port: int = 8000):
-    server = ThreadingHTTPServer(("127.0.0.1", port), CyclopathAPIHandler)
+    server = ThreadingHTTPServer((os.getenv("HOST", "0.0.0.0"), port), CyclopathAPIHandler)
     print(f"Cyclopath AI Native Multi-Threaded HTTP Server listening on http://127.0.0.1:{port}", flush=True)
     server.serve_forever()
 
