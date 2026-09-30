@@ -11,13 +11,6 @@
 [![Multimodal AI: Gemini 1.5](https://img.shields.io/badge/Multimodal%20AI-Google%20Gemini%201.5-purple)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey)](#)
 
----
-
-Executive Summary & 30-Second Pitch
-
-> **"Cyclopath AI is an AI-powered disaster intelligence and infrastructure vulnerability platform for cyclone-prone Indian communities. It combines cyclone atmospheric forecasts, satellite and geospatial data, critical asset telemetry, machine learning, and Google Gemini-powered reasoning to identify vulnerable infrastructure before a cyclone makes landfall. Instead of only telling authorities where the cyclone is heading, Cyclopath AI predicts which hospitals, power substations, bridges, and shelters will fail, explains *why* using Explainable AI (SHAP factors), calculates flood-safe evacuation routes via Dijkstra graph algorithms, and synthesizes prioritized, role-specific emergency action plans in English, Hindi, and Marathi."**
-
----
 
 The Problem: Solving for India's 7,516 km Coastline
 
