@@ -5,6 +5,7 @@ import time
 import sys
 import subprocess
 import os
+import secrets
 
 BASE = "http://127.0.0.1:8000/api"
 
@@ -46,7 +47,14 @@ if __name__ == "__main__":
     if not wait_for_server(timeout=1):
         print("Starting background server for test runner...", flush=True)
         server_py = os.path.join(os.path.dirname(__file__), "server.py")
-        server_proc = subprocess.Popen([sys.executable, server_py])
+        test_env = os.environ.copy()
+        test_env.update({
+            "DEMO_MODE": "true",
+            "ENABLE_DEMO_AUTH": "true",
+            "JWT_SECRET": secrets.token_urlsafe(48),
+            "AUTH_DEMO_ADMIN_PASSWORD": "ci-test-only-admin-password",
+        })
+        server_proc = subprocess.Popen([sys.executable, server_py], env=test_env)
         if not wait_for_server(timeout=10):
             print("Failed to start server process.", flush=True)
             if server_proc:
@@ -70,7 +78,7 @@ if __name__ == "__main__":
         p12, _ = test_endpoint("Multimodal Safe Fallback", f"{BASE}/multimodal/analyze", method="POST", data={"asset_id": "TEST_HOSP_01", "context_notes": "Structural inspection"})
 
         # Authentication Checks
-        p13, login_data = test_endpoint("Admin Login", f"{BASE}/auth/login", method="POST", data={"username": "admin", "password": "cyclopath2026!"})
+        p13, login_data = test_endpoint("Admin Login", f"{BASE}/auth/login", method="POST", data={"username": "admin", "password": "ci-test-only-admin-password"})
         admin_token = login_data.get("access_token") if isinstance(login_data, dict) else None
 
         p14, citizen_data = test_endpoint("Citizen Demo Token", f"{BASE}/auth/demo-token", method="POST", data={"role": "Public Citizen"})
