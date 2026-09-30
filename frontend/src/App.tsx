@@ -18,12 +18,16 @@ import { SettingsModal } from './components/SettingsModal';
 
 import { Language } from './i18n/translations';
 import { UserRole, Cyclone, RiskSummary, InfrastructureAsset, Alert } from './types';
-import { api } from './services/api';
+import { api, setActiveUserRole } from './services/api';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<string>('dashboard');
   const [language, setLanguage] = useState<Language>('en');
   const [userRole, setUserRole] = useState<UserRole>('Disaster_Authority');
+
+  useEffect(() => {
+    setActiveUserRole(userRole);
+  }, [userRole]);
 
   // Application Data States
   const [cyclone, setCyclone] = useState<Cyclone | null>(null);
@@ -178,6 +182,7 @@ export const App: React.FC = () => {
             <AlertsPanel
               alerts={alerts}
               onAlertAcknowledged={handleAlertAck}
+              userRole={userRole}
             />
           )}
 
@@ -216,6 +221,7 @@ export const App: React.FC = () => {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         onWeightsUpdated={loadPlatformData}
+        userRole={userRole}
       />
     </div>
   );

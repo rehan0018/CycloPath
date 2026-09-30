@@ -15,12 +15,15 @@ import { api } from '../services/api';
 interface AlertsPanelProps {
   alerts: Alert[];
   onAlertAcknowledged: (id: number) => void;
+  userRole?: string;
 }
 
 export const AlertsPanel: React.FC<AlertsPanelProps> = ({
   alerts,
-  onAlertAcknowledged
+  onAlertAcknowledged,
+  userRole = 'Disaster_Authority'
 }) => {
+  const isCitizen = userRole === 'Public_Citizen';
   const [filterSeverity, setFilterSeverity] = useState<string>('all');
 
   const filtered = alerts.filter(a => {
@@ -106,13 +109,19 @@ export const AlertsPanel: React.FC<AlertsPanelProps> = ({
                   </div>
 
                   {!alert.acknowledged ? (
-                    <button
-                      onClick={() => handleAck(alert.id)}
-                      className="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition flex items-center gap-1"
-                    >
-                      <Check className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Acknowledge</span>
-                    </button>
+                    isCitizen ? (
+                      <span className="text-slate-500 font-medium text-[11px] bg-slate-900 border border-slate-800 px-2 py-0.5 rounded">
+                        Command Auth Required
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => handleAck(alert.id)}
+                        className="px-3 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs transition flex items-center gap-1 cursor-pointer"
+                      >
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>Acknowledge</span>
+                      </button>
+                    )
                   ) : (
                     <span className="text-emerald-400 font-semibold flex items-center gap-1 text-[11px]">
                       <CheckCircle2 className="w-3.5 h-3.5" />

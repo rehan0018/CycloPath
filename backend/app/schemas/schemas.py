@@ -65,6 +65,9 @@ class RiskAssessmentResponse(BaseModel):
     overall_vulnerability_score: float
     risk_category: str
     priority_rank: int
+    imd_alert_stage: str = "Stage IV: Red Alert (Take Action)"
+    data_source: str = "Demo Simulation (Synthetic Coastal Dataset)"
+    disclaimer: str = "AI-generated risk estimates are decision-support outputs and must be validated against official IMD and SDMA information before operational use."
     
     shap_factors: List[ShapFactor] = []
     ai_explanation: str

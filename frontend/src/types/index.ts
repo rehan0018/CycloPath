@@ -33,6 +33,9 @@ export interface RiskAssessment {
   shap_factors: ShapFactor[];
   ai_explanation: string;
   recommended_actions: string[];
+  imd_alert_stage?: string;
+  data_source?: string;
+  disclaimer?: string;
 }
 
 export interface MLPrediction {

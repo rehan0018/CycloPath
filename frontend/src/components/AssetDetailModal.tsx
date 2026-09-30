@@ -41,11 +41,19 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
         {/* Header */}
         <div className="p-4 sm:p-5 bg-gradient-to-r from-[#11192e] to-[#0d1424] border-b border-slate-800 flex items-start justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                 score >= 80 ? 'badge-critical' : score >= 60 ? 'badge-high' : 'badge-moderate'
               }`}>
                 {cat.toUpperCase()} RISK • {score}/100
+              </span>
+              {ra?.imd_alert_stage && (
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-950/40 border border-red-500/30 text-red-300">
+                  {ra.imd_alert_stage.split(':')[0] || 'IMD Alert'}
+                </span>
+              )}
+              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">
+                Demo Simulation
               </span>
               <span className="text-[11px] font-mono text-slate-400">{asset.asset_id}</span>
             </div>
@@ -168,6 +176,19 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
                 <div className="text-xs text-slate-400">No emergency interventions required currently.</div>
               )}
             </div>
+          </div>
+
+          {/* National Disaster Framework Alignment & Disclaimer */}
+          <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-400 space-y-1.5">
+            <div className="flex items-center gap-1.5 text-cyan-400 font-semibold text-xs">
+              <ShieldAlert className="w-4 h-4" />
+              <span>National Disaster Framework Alignment: {ra?.imd_alert_stage || 'Stage IV Alert'}</span>
+            </div>
+            <p className="leading-relaxed">
+              Vulnerability assessment calibrated against IMD 4-Stage Cyclone Warning directives. 
+              Outputs are intended strictly for decision-support and contingency planning. 
+              Always cross-reference with official bulletins from IMD, NDMA, and local district authorities before deploying emergency teams.
+            </p>
           </div>
         </div>
 

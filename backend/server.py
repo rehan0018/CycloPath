@@ -258,8 +258,15 @@ class CyclopathAPIHandler(BaseHTTPRequestHandler):
         except Exception:
             payload = {}
 
-        # Weights update
+        # Role-based authorization check
+        user_role = self.headers.get("X-User-Role", "Disaster_Authority")
+        is_admin = user_role in ("Disaster Management Authority", "Disaster_Authority", "Municipal Officer", "Municipal_Officer", "Admin")
+
+        # Weights update (Admin/Authority only)
         if path == "/api/risk/weights":
+            if not is_admin:
+                self.send_json({"error": "Forbidden: Administrative authorization required to reconfigure mathematical risk weights", "current_role": user_role}, status=403)
+                return
             weights = RiskWeights(**payload)
             risk_engine.set_weights(weights)
             self.send_json(risk_engine.weights.model_dump())
@@ -290,11 +297,11 @@ class CyclopathAPIHandler(BaseHTTPRequestHandler):
         # Multimodal Image Inspection
         if path == "/api/multimodal/analyze":
             req = MultimodalAnalysisRequest(**payload)
-            result = asyncio.run(gemini_service.analyze_infrastructure_image(
+            result = gemini_service.analyze_infrastructure_image_sync(
                 image_base64=req.image_base64,
                 asset_id=req.asset_id,
                 context_notes=req.context_notes
-            ))
+            )
             self.send_json(result.model_dump())
             return
 
@@ -312,8 +319,11 @@ class CyclopathAPIHandler(BaseHTTPRequestHandler):
             self.send_json(resp.model_dump())
             return
 
-        # Alert acknowledge
+        # Alert acknowledge (Command personnel only)
         if path.startswith("/api/alerts/") and path.endswith("/ack"):
+            if not is_admin and user_role not in ("Emergency Responder", "Emergency_Responder"):
+                self.send_json({"error": "Forbidden: Operational role required to acknowledge disaster alerts", "current_role": user_role}, status=403)
+                return
             alert_id = int(path.split("/")[-2])
             alert_service.acknowledge_alert(alert_id)
             self.send_json({"status": "acknowledged", "alert_id": alert_id})

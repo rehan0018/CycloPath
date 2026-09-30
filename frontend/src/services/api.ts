@@ -14,16 +14,30 @@ import {
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/+$/, '');
 
+let currentRole = 'Disaster Management Authority';
+
+export function setActiveUserRole(role: string) {
+  currentRole = role;
+}
+
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+  const headers = {
+    'Content-Type': 'application/json',
+    'X-User-Role': currentRole,
+    ...(options?.headers || {})
+  };
+
   const res = await fetch(url, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options?.headers || {})
-    }
+    headers
   });
   if (!res.ok) {
-    throw new Error(`API error ${res.status}: ${res.statusText}`);
+    let errorDetail = res.statusText;
+    try {
+      const errJson = await res.json();
+      errorDetail = errJson.detail || errJson.error || errorDetail;
+    } catch {}
+    throw new Error(`API error ${res.status}: ${errorDetail}`);
   }
   return res.json();
 }

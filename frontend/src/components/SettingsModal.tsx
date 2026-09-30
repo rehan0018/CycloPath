@@ -14,13 +14,16 @@ interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onWeightsUpdated?: () => void;
+  userRole?: string;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
-  onWeightsUpdated
+  onWeightsUpdated,
+  userRole = 'Disaster_Authority'
 }) => {
+  const isAuthorized = userRole === 'Disaster_Authority' || userRole === 'Municipal_Officer';
   const [weights, setWeights] = useState({
     cyclone_exposure: 0.25,
     flood_exposure: 0.20,
@@ -207,11 +210,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
         </div>
 
+        {/* Authorization Notice if citizen */}
+        {!isAuthorized && (
+          <div className="mx-6 mb-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>Read-Only Mode: Modifying multi-hazard formula weights requires Disaster Management Authority or Municipal Officer credentials.</span>
+          </div>
+        )}
+
         {/* Footer */}
         <div className="p-4 bg-[#090d18] border-t border-slate-800 flex items-center justify-between">
           <button
             onClick={handleReset}
-            className="text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5"
+            disabled={!isAuthorized}
+            className="text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset Standards</span>
@@ -219,17 +231,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
           <button
             onClick={handleSave}
-            disabled={saving}
-            className="px-5 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-lg transition"
+            disabled={saving || !isAuthorized}
+            className={`px-5 py-2 rounded-xl font-bold text-xs flex items-center gap-1.5 shadow-lg transition ${
+              isAuthorized 
+                ? 'bg-cyan-600 hover:bg-cyan-500 text-white cursor-pointer' 
+                : 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700'
+            }`}
           >
             {saving ? (
               <span className="animate-spin w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full"></span>
-            ) : saveSuccess ? (
-              <Check className="w-3.5 h-3.5 text-white" />
             ) : (
-              <Check className="w-3.5 h-3.5 text-white" />
+              <Check className="w-3.5 h-3.5" />
             )}
-            <span>{saveSuccess ? 'Saved & Recalculated!' : 'Apply Risk Weights'}</span>
+            <span>{saveSuccess ? 'Saved & Recalculated!' : isAuthorized ? 'Apply Risk Weights' : 'Restricted (Admin Only)'}</span>
           </button>
         </div>
       </div>

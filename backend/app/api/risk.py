@@ -1,5 +1,5 @@
-from fastapi import APIRouter
-from typing import Dict, Any, List
+from fastapi import APIRouter, Header, HTTPException
+from typing import Dict, Any, List, Optional
 from .infrastructure import get_all_assets_evaluated
 from ..core.config import settings, RiskWeights
 from ..schemas.schemas import RiskWeightsSchema
@@ -79,8 +79,13 @@ def get_risk_weights():
     return risk_engine.weights
 
 @router.post("/weights", response_model=RiskWeightsSchema)
-def update_risk_weights(new_weights: RiskWeightsSchema):
+def update_risk_weights(
+    new_weights: RiskWeightsSchema,
+    x_user_role: Optional[str] = Header("Disaster_Authority")
+):
     """Allows administrators to dynamically rebalance risk engine weightings."""
+    if x_user_role not in ("Disaster Management Authority", "Disaster_Authority", "Municipal Officer", "Municipal_Officer", "Admin"):
+        raise HTTPException(status_code=403, detail="Administrative authorization required to reconfigure mathematical risk weights")
     weights = RiskWeights(**new_weights.model_dump())
     risk_engine.set_weights(weights)
     return risk_engine.weights

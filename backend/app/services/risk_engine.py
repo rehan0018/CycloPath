@@ -131,9 +131,22 @@ class RiskEngine:
         recommendations = self._generate_recommendations(asset, category, flood_exposure, surge_exposure, access_risk)
         ai_explanation = self._generate_rule_explanation(asset, total_score, category, shap_factors)
         
+        # Official IMD 4-Stage Warning Tier Correlation
+        if category == "Critical":
+            imd_stage = "Stage IV: Red Alert (Take Action / Immediate Landfall Threat)"
+        elif category == "High":
+            imd_stage = "Stage III: Orange Alert (Be Prepared / Pre-Landfall Warning)"
+        elif category == "Moderate":
+            imd_stage = "Stage II: Yellow Alert (Be Aware / Cyclone Watch)"
+        else:
+            imd_stage = "Stage I: Green / Advisory (Monitor Official Bulletins)"
+
         return {
             "overall_vulnerability_score": total_score,
             "risk_category": category,
+            "imd_alert_stage": imd_stage,
+            "data_source": "Demo Simulation (Synthetic Coastal Dataset)",
+            "disclaimer": "AI-generated risk estimates are decision-support outputs and must be validated against official IMD and SDMA information before operational use.",
             "cyclone_exposure": cyclone_exposure,
             "flood_exposure": flood_exposure,
             "storm_surge_exposure": surge_exposure,
