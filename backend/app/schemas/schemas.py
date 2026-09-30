@@ -101,7 +101,7 @@ class CycloneResponse(BaseModel):
     estimated_landfall_location: str
     storm_surge_potential_m: float
     rainfall_24h_mm: float
-    official_imd_bulletin_stage: str = "Stage IV: Post-Landfall Outlook / Red Alert (Official IMD RSMC New Delhi Bulletin for Coastal Odisha)"
+    official_imd_bulletin_stage: Optional[str] = None
     trajectory_points: List[CyclonePoint] = []
     cone_coordinates: List[List[float]] = []
 
