@@ -4,43 +4,39 @@ import hmac
 import json
 import time
 import os
+import secrets
 from typing import Dict, Any, Optional, List
 from .config import settings
 
-# Secret key for cryptographic signing (uses environment variable or secure fallback)
+# Each process gets an unpredictable fallback for single-instance local development.
+# Multi-instance deployments must set JWT_SECRET consistently through a secret manager.
+_EPHEMERAL_JWT_SECRET = secrets.token_urlsafe(48)
+
 def get_jwt_secret() -> str:
-    secret = settings.JWT_SECRET or os.getenv("JWT_SECRET")
-    if not secret:
-        # Secure deterministic fallback for demo/development environments
-        secret = "cyclopath-hmac-sha256-production-token-secret-2026-key"
-    return secret
+    return settings.JWT_SECRET or os.getenv("JWT_SECRET") or _EPHEMERAL_JWT_SECRET
 
 # Registered demo accounts for authenticated command staff & public users
 DEMO_USERS: Dict[str, Dict[str, Any]] = {
     "admin": {
         "username": "admin",
-        "password": "cyclopath2026!",
         "role": "Disaster Management Authority",
         "title": "State Incident Commander",
         "agency": "Odisha State Disaster Management Authority (OSDMA)"
     },
     "municipal": {
         "username": "municipal",
-        "password": "puri_urban2026",
         "role": "Municipal Officer",
         "title": "Municipal Commissioner",
         "agency": "Puri Municipal Corporation"
     },
     "responder": {
         "username": "responder",
-        "password": "odraf_response",
         "role": "Emergency Responder",
         "title": "ODRAF Rapid Action Lead",
         "agency": "Odisha Disaster Rapid Action Force (ODRAF)"
     },
     "citizen": {
         "username": "citizen",
-        "password": "public_guest",
         "role": "Public Citizen",
         "title": "Coastal Community Resident",
         "agency": "General Public"
@@ -117,11 +113,19 @@ def verify_token(token: str) -> Dict[str, Any]:
     return payload
 
 def authenticate_user(username: str, password: Optional[str] = None) -> Optional[Dict[str, Any]]:
-    """Authenticates a user by username and password against verified accounts."""
-    user = DEMO_USERS.get(username.lower().strip())
-    if not user:
+    """Authenticates demo users only when their password is supplied through the environment."""
+    user_key = username.lower().strip()
+    user = DEMO_USERS.get(user_key)
+    if not user or not password:
         return None
-    if password and user["password"] != password:
+    password_env = {
+        "admin": "AUTH_DEMO_ADMIN_PASSWORD",
+        "municipal": "AUTH_DEMO_MUNICIPAL_PASSWORD",
+        "responder": "AUTH_DEMO_RESPONDER_PASSWORD",
+        "citizen": "AUTH_DEMO_CITIZEN_PASSWORD",
+    }.get(user_key)
+    configured_password = os.getenv(password_env, "") if password_env else ""
+    if not configured_password or not hmac.compare_digest(configured_password, password):
         return None
     return user
 
