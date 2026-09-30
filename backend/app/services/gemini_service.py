@@ -73,71 +73,24 @@ class GeminiService:
         return self._fallback_image_analysis(asset_id, context_notes)
 
     def _fallback_image_analysis(self, asset_id: Optional[str], context_notes: Optional[str]) -> MultimodalAnalysisResponse:
-        """Domain-calibrated inspection reasoning fallback when Gemini API key is absent or offline."""
-        is_substation = asset_id and "PWR" in asset_id
-        is_hospital = asset_id and "HOSP" in asset_id
-        is_bridge = asset_id and "BRG" in asset_id
-
-        if is_substation:
-            return MultimodalAnalysisResponse(
-                asset_id=asset_id,
-                structural_integrity_concern="Critical",
-                visible_flooding="Standing flood water ~0.6m encroaching 33kV switchyard and transformer plinths.",
-                road_accessibility_status="Perimeter access road submerged; requires high-clearance utility trucks.",
-                damage_indicators=[
-                    "Turbid flood water within 40cm of live busbar clearance",
-                    "Perimeter sandbag barrier breached on southern edge",
-                    "Visible tree branch entanglement on 11kV distribution feeder"
-                ],
-                inspection_priority="Tier 1 (Immediate)",
-                reasoning="Transformer ground clearance is critically threatened by rising surface water. Immediate electrical de-energization recommended to prevent phase-to-ground flashover and catastrophic transformer loss.",
-                confidence=0.91
+        """Returns an explicit unavailable result; never invents visual evidence."""
+        return MultimodalAnalysisResponse(
+            asset_id=asset_id,
+            structural_integrity_concern="Not assessed",
+            visible_flooding="Not assessed: no image-based observation is available.",
+            road_accessibility_status="Not assessed: no image-based observation is available.",
+            damage_indicators=[],
+            inspection_priority="Unassigned",
+            reasoning=(
+                "No image assessment was performed. Configure Gemini access and submit an image, "
+                "then verify any findings with an on-site qualified inspector."
+            ),
+            confidence=0.0,
+            disclaimer=(
+                "Analysis unavailable or demo fallback. This response contains no image-derived findings "
+                "and must not be used for operational decisions."
             )
-        elif is_hospital:
-            return MultimodalAnalysisResponse(
-                asset_id=asset_id,
-                structural_integrity_concern="Elevated",
-                visible_flooding="Ground floor ambulance ramp partially inundated (~0.35m brackish water).",
-                road_accessibility_status="Primary gate restricted; alternate northern pedestrian corridor accessible.",
-                damage_indicators=[
-                    "Basement ventilation duct water ingress risk",
-                    "Exterior cladding tiles dislodged on windward facade",
-                    "Emergency diesel generator exhaust pipe vibration fatigue"
-                ],
-                inspection_priority="Tier 1 (Immediate)",
-                reasoning="Main trauma entrance accessibility is compromised by water accumulation. Ground floor medical stores must be elevated to Level 1 immediately.",
-                confidence=0.89
-            )
-        elif is_bridge:
-            return MultimodalAnalysisResponse(
-                asset_id=asset_id,
-                structural_integrity_concern="Elevated",
-                visible_flooding="River discharge velocity high; water level within 1.2m of girder soffit.",
-                road_accessibility_status="Approaches wet with silty mud; traction degraded.",
-                damage_indicators=[
-                    "Heavy drift debris accumulation against Pier 3",
-                    "Approaching embankment shoulder erosion observed on eastern abutment",
-                    "Expansion joint seal dislocation"
-                ],
-                inspection_priority="Tier 1 (Immediate)",
-                reasoning="High hydrodynamic pressure combined with debris blockage creates scour risk at pier footings. Axial load restrictions mandatory.",
-                confidence=0.87
-            )
-        else:
-            return MultimodalAnalysisResponse(
-                asset_id=asset_id,
-                structural_integrity_concern="Moderate",
-                visible_flooding="Surface runoff pooling detected near outer perimeter and entry gate.",
-                road_accessibility_status="Slow vehicular movement; road passable with caution.",
-                damage_indicators=[
-                    "Corrugated roofing sheet loosening along eaves",
-                    "Localized rainwater pooling against foundation base",
-                    "Vegetation debris scattered in utility courtyard"
-                ],
-                inspection_priority="Tier 2 (Within 6h)",
-                reasoning="Structural frame remains intact. Main vulnerability stems from peripheral water buildup and windborne debris. Routine physical inspection advised.",
-                confidence=0.85
-            )
+        )
 
     def generate_multilingual_citizen_alert(
         self,
