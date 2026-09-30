@@ -299,6 +299,9 @@ class CyclopathAPIHandler(BaseHTTPRequestHandler):
 
         # Authentication: Demo Token Issuance
         if path == "/api/auth/demo-token":
+            if not settings.DEMO_MODE or not settings.ENABLE_DEMO_AUTH:
+                self.send_json({"error": "Demo persona authentication is disabled"}, status=404)
+                return
             role_req = payload.get("role", "Disaster_Authority")
             target_role = ROLE_ALIASES.get(role_req, role_req)
             matched = None
