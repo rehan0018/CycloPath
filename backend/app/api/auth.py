@@ -8,6 +8,7 @@ from ..core.security import (
     DEMO_USERS, 
     ROLE_ALIASES
 )
+from ..core.config import settings
 
 router = APIRouter(prefix="/auth", tags=["Authentication & Security"])
 
@@ -81,7 +82,9 @@ def login(req: LoginRequest):
 
 @router.post("/demo-token", response_model=AuthResponse)
 def get_demo_token(req: RoleSwitchRequest):
-    """Issues a genuine server-signed JWT for the selected persona in demo/evaluation mode."""
+    """Issues a demo persona token only when explicitly enabled for a demo environment."""
+    if not settings.DEMO_MODE or not settings.ENABLE_DEMO_AUTH:
+        raise HTTPException(status_code=404, detail="Demo persona authentication is disabled")
     target_role = ROLE_ALIASES.get(req.role, req.role)
     matched_user = None
     for u in DEMO_USERS.values():
