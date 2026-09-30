@@ -33,7 +33,7 @@ export interface RiskAssessment {
   shap_factors: ShapFactor[];
   ai_explanation: string;
   recommended_actions: string[];
-  imd_alert_stage?: string;
+  model_version?: string;
   data_source?: string;
   disclaimer?: string;
 }
@@ -109,6 +109,7 @@ export interface Cyclone {
   estimated_landfall_location: string;
   storm_surge_potential_m: number;
   rainfall_24h_mm: number;
+  official_imd_bulletin_stage?: string;
   trajectory_points: CyclonePoint[];
   cone_coordinates: number[][];
 }

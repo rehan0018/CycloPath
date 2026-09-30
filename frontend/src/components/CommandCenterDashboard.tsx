@@ -52,11 +52,13 @@ export const CommandCenterDashboard: React.FC<DashboardProps> = ({
       {/* 1. Real-time Cyclone Status Banner */}
       <div className="rounded-2xl bg-gradient-to-r from-[#11192e] via-[#0d1424] to-[#090d18] border border-cyan-500/30 p-5 shadow-xl relative overflow-hidden">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping"></span>
               <span className="text-xs font-bold text-red-400 tracking-wider uppercase">
                 ACTIVE CYCLONIC THREAT • {cyclone?.category || 'Extremely Severe Cyclonic Storm (ESCS)'}
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-red-950/80 border border-red-500/50 text-red-300">
+                Official IMD Stage IV Red Alert
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white flex items-center gap-2">
@@ -65,12 +67,17 @@ export const CommandCenterDashboard: React.FC<DashboardProps> = ({
                 {cyclone?.cyclone_code || 'BOB-2026-03'}
               </span>
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 flex items-center gap-1.5">
-              <span>Projected Landfall:</span>
-              <strong className="text-cyan-300">{cyclone?.estimated_landfall_location || 'Between Puri and Paradip, Odisha'}</strong>
-              <span className="text-slate-400">({cyclone?.estimated_landfall_time || 'T-6.5 Hours'})</span>
-            </p>
-          </div>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-300">
+              <p>
+                <span>Projected Landfall: </span>
+                <strong className="text-cyan-300">{cyclone?.estimated_landfall_location || 'Between Puri and Paradip, Odisha'}</strong>
+                <span className="text-slate-400"> ({cyclone?.estimated_landfall_time || 'T-6.5 Hours'})</span>
+              </p>
+              <span className="text-slate-500">•</span>
+              <p className="text-slate-400 text-[11px]">
+                Official Source: <span className="text-slate-200">IMD RSMC New Delhi Bulletin #14</span>
+              </p>
+            </div>
 
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 text-xs">

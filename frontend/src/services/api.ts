@@ -15,16 +15,35 @@ import {
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/+$/, '');
 
 let currentRole = 'Disaster Management Authority';
+let authToken: string | null = typeof window !== 'undefined' ? localStorage.getItem('cyclopath_jwt_token') : null;
 
 export function setActiveUserRole(role: string) {
   currentRole = role;
 }
 
+export function setAuthToken(token: string | null) {
+  authToken = token;
+  if (token) {
+    localStorage.setItem('cyclopath_jwt_token', token);
+  } else {
+    localStorage.removeItem('cyclopath_jwt_token');
+  }
+}
+
+export function getAuthToken(): string | null {
+  if (!authToken && typeof window !== 'undefined') {
+    authToken = localStorage.getItem('cyclopath_jwt_token');
+  }
+  return authToken;
+}
+
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
-  const headers = {
+  const token = getAuthToken();
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     'X-User-Role': currentRole,
-    ...(options?.headers || {})
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...(options?.headers as Record<string, string> || {})
   };
 
   const res = await fetch(url, {
@@ -43,6 +62,28 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
 }
 
 export const api = {
+  // Authentication & Session
+  async login(username: string, password: string): Promise<{ access_token: string; role: string; username: string }> {
+    const data = await fetchJson<{ access_token: string; role: string; username: string }>(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      body: JSON.stringify({ username, password })
+    });
+    setAuthToken(data.access_token);
+    return data;
+  },
+
+  async fetchDemoToken(role: string): Promise<{ access_token: string; role: string; username: string }> {
+    const data = await fetchJson<{ access_token: string; role: string; username: string }>(`${API_BASE}/auth/demo-token`, {
+      method: 'POST',
+      body: JSON.stringify({ role })
+    });
+    setAuthToken(data.access_token);
+    return data;
+  },
+
+  async getProfile(): Promise<any> {
+    return fetchJson(`${API_BASE}/auth/me`);
+  },
   // Cyclones
   async getCyclones(): Promise<Cyclone[]> {
     return fetchJson<Cyclone[]>(`${API_BASE}/cyclones`);

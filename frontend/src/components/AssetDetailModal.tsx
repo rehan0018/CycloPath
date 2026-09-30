@@ -45,13 +45,11 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                 score >= 80 ? 'badge-critical' : score >= 60 ? 'badge-high' : 'badge-moderate'
               }`}>
-                {cat.toUpperCase()} RISK • {score}/100
+                VULNERABILITY: {cat.toUpperCase()} • {score}/100
               </span>
-              {ra?.imd_alert_stage && (
-                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-red-950/40 border border-red-500/30 text-red-300">
-                  {ra.imd_alert_stage.split(':')[0] || 'IMD Alert'}
-                </span>
-              )}
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-cyan-300">
+                AI Decision-Support
+              </span>
               <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">
                 Demo Simulation
               </span>
@@ -178,16 +176,16 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
             </div>
           </div>
 
-          {/* National Disaster Framework Alignment & Disclaimer */}
-          <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-400 space-y-1.5">
+          {/* Operational Decision-Support & IMD Warning Distinction */}
+          <div className="p-3.5 rounded-xl bg-[#090d19] border border-slate-800 text-[11px] text-slate-400 space-y-1.5">
             <div className="flex items-center gap-1.5 text-cyan-400 font-semibold text-xs">
               <ShieldAlert className="w-4 h-4" />
-              <span>National Disaster Framework Alignment: {ra?.imd_alert_stage || 'Stage IV Alert'}</span>
+              <span>Operational Vulnerability Metric • Distinct from Official IMD Bulletins</span>
             </div>
             <p className="leading-relaxed">
-              Vulnerability assessment calibrated against IMD 4-Stage Cyclone Warning directives. 
-              Outputs are intended strictly for decision-support and contingency planning. 
-              Always cross-reference with official bulletins from IMD, NDMA, and local district authorities before deploying emergency teams.
+              This score evaluates physical and operational infrastructure vulnerability (0–100) based on local elevation, tidal surge modeling, and power dependency. 
+              <strong className="text-slate-200"> It does not establish an official IMD warning stage or government evacuation order.</strong> 
+              Official meteorological cyclone warnings (Stage I–IV Alerts) are issued strictly at the regional/district level by the India Meteorological Department (IMD) and State Disaster Management Authorities (SDMA).
             </p>
           </div>
         </div>

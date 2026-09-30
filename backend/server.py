@@ -23,6 +23,7 @@ from app.api.infrastructure import get_all_assets_evaluated
 from app.api.simulation import run_scenario_simulation, SIMULATION_HISTORY
 from app.schemas.schemas import SimulationRequest, AgentQueryRequest, MultimodalAnalysisRequest, RouteRequest, RiskWeightsSchema
 from app.data.seed_data import DATA_SOURCES_SEED
+from app.core.security import authenticate_user, issue_token_for_user, verify_token, DEMO_USERS, ROLE_ALIASES
 
 class CyclopathAPIHandler(BaseHTTPRequestHandler):
     def send_cors_headers(self):
@@ -46,6 +47,16 @@ class CyclopathAPIHandler(BaseHTTPRequestHandler):
             
         body = json.dumps(data, default=default_serializer).encode("utf-8")
         self.wfile.write(body)
+
+    def get_authenticated_user(self) -> Optional[Dict[str, Any]]:
+        auth_header = self.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return None
+        token = auth_header.split("Bearer ", 1)[1].strip()
+        try:
+            return verify_token(token)
+        except Exception:
+            return None
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -243,6 +254,15 @@ class CyclopathAPIHandler(BaseHTTPRequestHandler):
             self.send_json(results)
             return
 
+        # Auth profile check
+        if path == "/api/auth/me":
+            user = self.get_authenticated_user()
+            if not user:
+                self.send_json({"error": "Unauthorized: Missing or invalid Bearer token. Send 'Authorization: Bearer <token>'."}, status=401)
+                return
+            self.send_json({"status": "authenticated", "verified_claims": user})
+            return
+
         # Not found fallback
         self.send_json({"error": "Endpoint not found", "path": path}, status=404)
 
@@ -258,14 +278,63 @@ class CyclopathAPIHandler(BaseHTTPRequestHandler):
         except Exception:
             payload = {}
 
-        # Role-based authorization check
-        user_role = self.headers.get("X-User-Role", "Disaster_Authority")
-        is_admin = user_role in ("Disaster Management Authority", "Disaster_Authority", "Municipal Officer", "Municipal_Officer", "Admin")
+        # Authentication: Login
+        if path == "/api/auth/login":
+            username = payload.get("username", "")
+            password = payload.get("password", "")
+            user = authenticate_user(username, password)
+            if not user:
+                self.send_json({"error": "Invalid username or password"}, status=401)
+                return
+            token = issue_token_for_user(user)
+            self.send_json({
+                "access_token": token,
+                "token_type": "bearer",
+                "username": user["username"],
+                "role": user["role"],
+                "title": user.get("title", ""),
+                "agency": user.get("agency", "")
+            })
+            return
 
-        # Weights update (Admin/Authority only)
+        # Authentication: Demo Token Issuance
+        if path == "/api/auth/demo-token":
+            role_req = payload.get("role", "Disaster_Authority")
+            target_role = ROLE_ALIASES.get(role_req, role_req)
+            matched = None
+            for u in DEMO_USERS.values():
+                if u["role"].lower() == target_role.lower():
+                    matched = u
+                    break
+            if not matched:
+                matched = DEMO_USERS["citizen"]
+            token = issue_token_for_user(matched)
+            self.send_json({
+                "access_token": token,
+                "token_type": "bearer",
+                "username": matched["username"],
+                "role": matched["role"],
+                "title": matched.get("title", ""),
+                "agency": matched.get("agency", "")
+            })
+            return
+
+        # Cryptographically verified user extraction
+        verified_user = self.get_authenticated_user()
+
+        # Weights update (Cryptographically verified Admin/Authority only)
         if path == "/api/risk/weights":
-            if not is_admin:
-                self.send_json({"error": "Forbidden: Administrative authorization required to reconfigure mathematical risk weights", "current_role": user_role}, status=403)
+            if not verified_user:
+                self.send_json({
+                    "error": "Unauthorized: Server-verified cryptographic authentication required to modify mathematical risk weights. Provide a valid 'Authorization: Bearer <token>' header."
+                }, status=401)
+                return
+            role = verified_user.get("role", "")
+            if role not in ("Disaster Management Authority", "Municipal Officer"):
+                self.send_json({
+                    "error": f"Forbidden: Administrative clearance required. Verified identity '{verified_user.get('sub')}' with role '{role}' is not authorized to reconfigure risk engine weights.",
+                    "verified_user": verified_user.get("sub")
+                }, status=403)
                 return
             weights = RiskWeights(**payload)
             risk_engine.set_weights(weights)
@@ -319,14 +388,28 @@ class CyclopathAPIHandler(BaseHTTPRequestHandler):
             self.send_json(resp.model_dump())
             return
 
-        # Alert acknowledge (Command personnel only)
+        # Alert acknowledge (Cryptographically verified Command personnel only)
         if path.startswith("/api/alerts/") and path.endswith("/ack"):
-            if not is_admin and user_role not in ("Emergency Responder", "Emergency_Responder"):
-                self.send_json({"error": "Forbidden: Operational role required to acknowledge disaster alerts", "current_role": user_role}, status=403)
+            if not verified_user:
+                self.send_json({
+                    "error": "Unauthorized: Valid Bearer token required to acknowledge disaster alerts. Pass 'Authorization: Bearer <token>'."
+                }, status=401)
+                return
+            role = verified_user.get("role", "")
+            if role not in ("Disaster Management Authority", "Municipal Officer", "Emergency Responder"):
+                self.send_json({
+                    "error": f"Forbidden: Operational clearance required. Public citizen role cannot acknowledge disaster alerts.",
+                    "verified_user": verified_user.get("sub")
+                }, status=403)
                 return
             alert_id = int(path.split("/")[-2])
             alert_service.acknowledge_alert(alert_id)
-            self.send_json({"status": "acknowledged", "alert_id": alert_id})
+            self.send_json({
+                "status": "acknowledged", 
+                "alert_id": alert_id,
+                "acknowledged_by": verified_user.get("sub"),
+                "role": role
+            })
             return
 
         self.send_json({"error": "Endpoint not found", "path": path}, status=404)

@@ -65,9 +65,9 @@ class RiskAssessmentResponse(BaseModel):
     overall_vulnerability_score: float
     risk_category: str
     priority_rank: int
-    imd_alert_stage: str = "Stage IV: Red Alert (Take Action)"
+    model_version: str = "Cyclopath-Vulnerability-Surrogate-v1.2"
     data_source: str = "Demo Simulation (Synthetic Coastal Dataset)"
-    disclaimer: str = "AI-generated risk estimates are decision-support outputs and must be validated against official IMD and SDMA information before operational use."
+    disclaimer: str = "Cyclopath AI Prototype Vulnerability Score. This score represents physical and operational asset vulnerability. It does NOT represent an official IMD cyclone warning or government evacuation order."
     
     shap_factors: List[ShapFactor] = []
     ai_explanation: str
@@ -101,6 +101,7 @@ class CycloneResponse(BaseModel):
     estimated_landfall_location: str
     storm_surge_potential_m: float
     rainfall_24h_mm: float
+    official_imd_bulletin_stage: str = "Stage IV: Post-Landfall Outlook / Red Alert (Official IMD RSMC New Delhi Bulletin for Coastal Odisha)"
     trajectory_points: List[CyclonePoint] = []
     cone_coordinates: List[List[float]] = []
 

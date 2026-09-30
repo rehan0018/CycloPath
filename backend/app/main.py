@@ -12,6 +12,7 @@ from .api.alerts import router as alerts_router
 from .api.reports import router as reports_router
 from .api.health import router as health_router
 from .api.data_sources import router as data_sources_router
+from .api.auth import router as auth_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -32,6 +33,7 @@ app.add_middleware(
 
 # Mount all API routers under /api
 api_prefix = settings.API_V1_STR
+app.include_router(auth_router, prefix=api_prefix)
 app.include_router(cyclone_router, prefix=api_prefix)
 app.include_router(infrastructure_router, prefix=api_prefix)
 app.include_router(risk_router, prefix=api_prefix)

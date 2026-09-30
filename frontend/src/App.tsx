@@ -27,6 +27,9 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     setActiveUserRole(userRole);
+    api.fetchDemoToken(userRole).catch(err => {
+      console.warn('Auto-session token handshake notice:', err);
+    });
   }, [userRole]);
 
   // Application Data States
