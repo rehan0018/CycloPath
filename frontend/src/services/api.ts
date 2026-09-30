@@ -12,7 +12,7 @@ import {
   DataSource
 } from '../types';
 
-const API_BASE = 'http://127.0.0.1:8000/api';
+const API_BASE = (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\\/+$/, '');
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
