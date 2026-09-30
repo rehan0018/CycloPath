@@ -290,7 +290,11 @@ class CyclopathAPIHandler(BaseHTTPRequestHandler):
         # Multimodal Image Inspection
         if path == "/api/multimodal/analyze":
             req = MultimodalAnalysisRequest(**payload)
-            result = asyncio.run(gemini_service.analyze_infrastructure_image(\n                image_base64=req.image_base64,\n                asset_id=req.asset_id,\n                context_notes=req.context_notes\n            ))
+            result = asyncio.run(gemini_service.analyze_infrastructure_image(
+                image_base64=req.image_base64,
+                asset_id=req.asset_id,
+                context_notes=req.context_notes
+            ))
             self.send_json(result.model_dump())
             return
 
